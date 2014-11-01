@@ -1,0 +1,125 @@
+<?
+$title = $this->_('User List');
+$this->headTitle($title, 'SET');
+$this->textDelay('breadcrumbText', $title);
+
+$form = $this->form ? $this->form : new User\Form\UserSearchForm();
+$form->setView($this)
+     ->setMethod('get')
+     ->setAction($this->uri('/admin/user/'))
+     ->prepare();
+
+$lableMap = array(
+    'active' => 'label-success',
+    'inactive' => 'label-warning',
+    'deleted' => 'label-inverse',
+);
+?>
+<div class="row">
+    <div class="span10">
+        <div class="slate">
+            <form <?=$this->formAttr($form)?> class="form-inline">
+                <?=$form->helper('keyword', array('class' => 'input-large', 'placeholder' => 'Keyword...'))?>
+                <?=$form->helper('status', 'formSelect', array('class' => 'span2'))?>
+                <?=$form->helper('gender', 'formSelect', array('class' => 'span2'))?>
+                <?=$form->helper('onlineStatus', 'formSelect', array('class' => 'span2'))?>
+                <?=$form->helper('country', 'formSelect', array('class' => 'span2'))?>  
+                <?=$form->helper('city', array('class' => 'span2', 'placeholder' => 'City'))?>        
+                <?=$form->helper('industry', array('class' => 'span2', 'placeholder' => 'Industry'))?>  
+                <?=$form->helper('tag', 'formText', array('class' => 'span1', 'placeholder' => 'Tag'))?>
+
+                <button class="btn" type="submit"><?=$this->_('Filter Users')?></button>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="span10 listing-buttons">
+        <div class="btn-group pull-right">
+            <a href="<?=$this->uri('/admin/user/create')?>" class="btn btn-info"><?=$this->_('Add New User')?></a>
+        </div>
+        <form action="<?=$this->uri('/admin/user/multi/')?>" method="post" class="pull-left" data-multiform="post">
+            <input type="hidden" name="id" class="multiform-container-main" value="" />
+            <input type="hidden" name="order" class="multiform-container" value="" />
+            <div class="btn-group">
+                <span class="btn"><input type="checkbox" class="multiform-checker" /></span>
+                <span data-toggle="dropdown" class="btn dropdown-toggle">
+                    <?=$this->_('Status')?>
+                    <span class="caret"></span>
+                </span>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="multiform-submiter" data-multiform-action="<?=$this->uri('/admin/user/multi/status/active')?>"><?=$this->_('Active')?></a></li>
+                    <li><a href="#" class="multiform-submiter" data-multiform-action="<?=$this->uri('/admin/user/multi/status/inactive')?>"><?=$this->_('Inactive')?></a></li>
+                    <li><a href="#" class="multiform-submiter" data-multiform-action="<?=$this->uri('/admin/user/multi/status/blocked')?>"><?=$this->_('Blocked')?></a></li>
+                    <li><a href="#" class="multiform-submiter" data-multiform-action="<?=$this->uri('/admin/user/multi/status/deleted')?>"><?=$this->_('Deleted')?></a></li>
+                </ul>
+            </div>
+        </form>
+    </div>
+
+    <div class="span10">
+        <div class="slate">
+            <div class="page-header">
+                <div class="btn-group pull-right">
+                    <span data-toggle="dropdown" class="btn dropdown-toggle">
+                        <?=$this->_('Order')?> <span class="caret"></span>
+                    </span>
+                    <ul class="dropdown-menu">
+                        <li><a href="<?=$this->uri('/admin/user/', 'dq', array('Q' => $this->query, 'q' => array('order' => 'idasc',),));?>" class=""><i class="icon-arrow-up"></i> <?=$this->_('Id')?></a></li>
+                        <li><a href="<?=$this->uri('/admin/user/', 'dq', array('Q' => $this->query, 'q' => array('order' => 'iddesc',),));?>" class=""><i class="icon-arrow-down"></i> <?=$this->_('Id')?></a></li>
+                        <li><a href="<?=$this->uri('/admin/user/', 'dq', array('Q' => $this->query, 'q' => array('order' => 'nameasc',),));?>" class=""><i class="icon-arrow-up"></i> <?=$this->_('Title')?></a></li>
+                        <li><a href="<?=$this->uri('/admin/user/', 'dq', array('Q' => $this->query, 'q' => array('order' => 'namedesc',),));?>" class=""><i class="icon-arrow-down"></i> <?=$this->_('Title')?></a></li>
+                        <li><a href="<?=$this->uri('/admin/user/', 'dq', array('Q' => $this->query, 'q' => array('order' => 'timeasc',),));?>" class=""><i class="icon-arrow-up"></i> <?=$this->_('Time')?></a></li>
+                        <li><a href="<?=$this->uri('/admin/user/', 'dq', array('Q' => $this->query, 'q' => array('order' => 'timedesc',),));?>" class=""><i class="icon-arrow-down"></i> <?=$this->_('Time')?></a></li>
+                    </ul>
+                </div>
+                <h2><?=$title?></h2>
+            </div>
+
+            <table class="orders-table table">
+                <thead>
+                    <tr>
+                        <th class="span1">
+                        </th>
+                        <th><?=$this->_('User Name')?></th>
+                        <th class="span1"><?=$this->_('Info')?></th>
+                        <th class="actions"><?=$this->_('Actions')?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?if($this->users):?>
+                    <?foreach($this->users as $key=>$user):?>
+                    <tr class="">
+                        <td>
+                            <input name="id" type="checkbox" class="multiform-item-checkbox"  data-multiform="post" data-multiform-itemid="<?=$user['id'] ?>" value="<?=$user['id'] ?>" />
+                        </td>	
+                        <td>
+                            <a href="<?=$this->uri('/admin/user/' . $user['id'])?>" class="title"><?=$user['userName'] ?></a>
+                            <span class="label <?=$lableMap[$user['status']]?>"><?=$this->_($user['status'])?></span>
+                            <p>
+                            <span class="meta"> <?=$user['registerTime'];?></span>
+                            </p>
+                        </td>
+                        <td>
+                        </td>
+                        <td class="actions">
+                            <a href="<?=$this->uri('/admin/user/remove/' . $user['id'], 'c', array('c' => $this->uri('/admin/user', array('page' => $this->page)))); ?>" class="btn btn-small btn-danger"><?=$this->_('Delete')?></a>
+                            <a href="<?=$this->uri('/admin/user/' . $user['id'])?>" class="btn btn-small"><?=$this->_('Edit')?></a>
+                        </td>
+                    </tr>
+                    <?endforeach;?>
+                    <?endif;?>
+                </tbody>
+            </table>
+        </div>
+    </div><!--span10 end-->
+
+    <div class="span10">
+        <?if($this->paginator):?>
+        <?=$this->paginator->setPath('/admin/user/')->setBaseQuery($this->query);?>
+        <?=$this->widget('Core', 'widgets/paginator', $this->vars())?>
+        <?endif;?>
+    </div>
+
+</div>
+

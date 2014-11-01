@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset="utf-8" />
+    <?=$this->headTitle()?>
+	<!--[if lt IE 9]>
+	<meta http-equiv="PRAGMA" content="NO-CACHE" />
+    <script src="<?=$this->link('/lib/js/html5shiv/html5shiv.min.js')?>"></script>
+	<![endif]-->
+    <?=$this->headMeta()?>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="<?=$this->link('/lib/css/bootstrap/bootstrap.css')?>" media="all" rel="stylesheet" type="text/css" />
+    <link href="<?=$this->link('/lib/css/bootstrap/bootstrap-responsive.css')?>" media="all" rel="stylesheet" type="text/css" />
+    <link href="<?=$this->link('/lib/css/fontawesome/css/font-awesome.css')?>" media="all" rel="stylesheet" type="text/css" />
+    <link href="<?=$this->link('/lib/css/typo/typo.css')?>" media="all" rel="stylesheet" type="text/css" />
+    <link href="<?=$this->link('/src/admin/css/admin.css')?>" media="all" rel="stylesheet" type="text/css" />
+    <?=$this->evajs()?>
+    <script src="<?=$this->link('/lib/js/labjs/labjs.min.js')?>"></script>
+    <script src="<?=$this->link('/lib/js/jquery/jquery.min.js')?>"></script>
+    <script src="<?=$this->link('/eva/js/core.js')?>"></script>
+    <script src="<?=$this->link('/eva/js/ui.js')?>"></script>
+    <script src="<?=$this->link('/src/admin/js/init.js')?>"></script>
+
+</head>
+
+<body>
+    <?=$this->content?>
+    <script>
+        eva.init(eva_config);
+    </script>
+</body>
+</html>

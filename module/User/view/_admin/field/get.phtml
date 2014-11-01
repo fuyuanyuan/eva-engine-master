@@ -1,0 +1,266 @@
+<?
+$item = $this->item;
+$title = $item ? 'Edit User Field' : 'Create User Field';
+$title = $this->_($title);
+$method = $item ? 'put' : 'post';
+$this->headTitle($title, 'SET');
+$this->textDelay('breadcrumbText', $title);
+
+if($this->form){
+	$form = $this->form;
+} else {
+    if($item) {
+        $form = new User\Form\FieldEditForm();
+        $form->useSubFormGroup();
+        $form->setMethod('put');
+    } else {
+        $form = new User\Form\FieldForm();
+        $form->useSubFormGroup();
+        $form->setMethod('post');
+    }
+}
+
+$roleValues = array();
+if(isset($item['FieldRole'])){
+    foreach($item['FieldRole'] as $fieldRole){
+        $roleValues[] = $fieldRole['role_id'];
+    }
+}
+
+$form->setView($this)
+     ->setAction($this->uri('/admin/user/field/'))
+     ->bind($item)
+     ->prepare();
+?>
+
+<input id="flash-messenger" type="hidden" value="<?=is_array($this->flashMessenger) ? implode(',', $this->flashMessenger) : ''?>" />
+<div id="user-create-succeed" class="alert alert-success hide">
+    <a href="#" data-dismiss="alert" class="close">x</a>
+    <h4 class="alert-heading"><?=$this->_('New Field Created')?></h4>
+</div>
+
+<div id="user-edit-succeed" class="alert alert-success hide">
+    <a href="#" data-dismiss="alert" class="close">x</a>
+    <h4 class="alert-heading"><?=$this->_('Field Edit Succeed')?></h4>
+</div>
+
+<div id="user-edit-failed" class="alert alert-error hide">
+    <a href="#" data-dismiss="alert" class="close">x</a>
+    <h4 class="alert-heading"><?=$this->_('Field Edit Failed')?></h4>
+</div>
+
+
+
+<div class="row">
+    <form <?=$this->formAttr($form)?>>
+        <?=$form->restful();?>
+        <?=$form->helper('id');?>
+        <div class="span10">
+            <div class="slate">
+                <div class="page-header">
+                    <?if($item):?>
+                    <div class="btn-group pull-right">
+                        <a href="<?=$this->uri('/admin/user/field/create')?>" class="btn"><?=$this->_('Clear Cache')?></a>
+                        <a href="<?=$this->uri('/admin/user/field/remove/' . $item['id'], 'c', array('c' => $this->uri('/admin/user/field/' . $item['id']))); ?>" class="btn"><?=$this->_('Delete')?></a>
+                    </div>
+                    <?endif?>
+                    <h2><?=$title?></h2>
+                </div>
+            </div>
+        </div><!--span10 end-->
+
+        <div class="span5">
+            <div class="slate">
+                <div class="page-header">
+                    <h3><?=$this->_('Field Basic Info')?></h3>
+                </div>
+
+                <fieldset class="form-horizontal">
+                    <div class="control-group <?=$form->isError('label') ? 'error' : '';?>">
+                        <?=$form->helper('label', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('label', array('class' => ''))?>        
+                            <div class="help-block">
+                                <?=$form->helper('label', 'formElementErrors')?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group <?=$form->isError('fieldName') ? 'error' : '';?>">
+                        <?=$form->helper('fieldName', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('fieldName', array('class' => ''))?>        
+                            <div class="help-block">
+                                <?=$this->_('Field Name will not display on user page, just for admin note. No input will as same as field label.')?>
+                                <?=$form->helper('fieldName', 'formElementErrors')?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group <?=$form->isError('fieldType') ? 'error' : '';?>">
+                        <?=$form->helper('fieldType', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('fieldType', 'formSelect', array('class' => ''))?>        
+                            <div class="help-block"><?=$form->helper('fieldType', 'formElementErrors')?></div>
+                        </div>
+                    </div>
+                    <div class="control-group <?=$form->isError('description') ? 'error' : '';?>">
+                        <?=$form->helper('description', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('description', 'formTextarea', array('class' => ''))?>        
+                            <div class="help-block"><?=$form->helper('description', 'formElementErrors')?></div>
+                        </div>
+                    </div>
+
+                    <div class="control-group <?=$form->isError('fieldKey') ? 'error' : '';?>">
+                        <?=$form->helper('fieldKey', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('fieldKey', array('class' => ''))?>        
+                            <div class="help-block">
+                                <?=$this->_('Only allow alphanumeric. No input will create by random')?>
+                                <?=$form->helper('fieldKey', 'formElementErrors')?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group <?=$form->isError('required') ? 'error' : '';?>">
+                        <?=$form->helper('required', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('required', 'formSelect', array('class' => ''))?>        
+                            <div class="help-block"><?=$form->helper('required', 'formElementErrors')?></div>
+                        </div>
+                    </div>
+                    <div class="control-group <?=$form->isError('defaultValue') ? 'error' : '';?>">
+                        <?=$form->helper('defaultValue', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('defaultValue', array('class' => ''))?>        
+                            <div class="help-block">
+                                <?=$this->_('Multi default value required a json format array.')?>
+                                <?=$form->helper('defaultValue', 'formElementErrors')?>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div><!--span5 end-->
+
+        <div class="span5">
+            <div class="slate">
+                <div class="page-header">
+                    <h3><?=$this->_('Apply to')?></h3>
+                </div>
+                <fieldset class="form-horizontal">
+                    <div class="control-group <?=$form->isError('applyToAll') ? 'error' : '';?>">
+                        <?=$form->helper('applyToAll', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('applyToAll', 'formSelect', array('class' => ''))?>        
+                            <div class="help-block"><?=$form->helper('applyToAll', 'formElementErrors')?></div>
+                        </div>
+                    </div>
+                    <div class="control-group <?=$form->isError(array('FieldRole', 'role_id')) ? 'error' : '';?>">
+                        <?=$form->helper(array('FieldRole', 'role_id'), 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper(array('FieldRole', 'role_id'), 'formMultiCheckbox', array(
+                                'class' => '',
+                                //'value_options' => $this->action('User\Api\Controller\RoleController', 'multicheckboxAction'),
+                                'value' => $roleValues,
+                            ))?>
+                            <div class="help-block"><?=$form->helper(array('FieldRole', 'role_id'), 'formElementErrors')?></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div><!--span5 end-->
+
+
+        <div class="span10">
+            <div class="slate">
+                <div class="page-header">
+                    <h2><?=$this->_('Field Options')?></h2>
+                </div>
+                <?foreach($form->get('Fieldoption') as $subForm):?>
+                <fieldset class="fieldoptions">
+                    <div class="control-group <?=$subForm->isError('label') ? 'error' : '';?> span3">
+                        <?=$subForm->helper('id');?>
+                        <?=$subForm->helper('label', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$subForm->helper('label', array('class' => ''))?>        
+                            <div class="help-block"><?=$subForm->helper('label', 'formElementErrors')?></div>
+                        </div>
+                    </div>
+                    <div class="control-group <?=$subForm->isError('option') ? 'error' : '';?> span3">
+                        <?=$subForm->helper('option', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$subForm->helper('option', array('class' => ''))?>        
+                            <div class="help-block"><?=$subForm->helper('option', 'formElementErrors')?></div>
+                        </div>
+                    </div>
+                    <div class="control-group <?=$subForm->isError('order') ? 'error' : '';?> span1">
+                        <?=$subForm->helper('order', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$subForm->helper('order', array('class' => 'input-mini'))?>        
+                            <div class="help-block"><?=$subForm->helper('order', 'formElementErrors')?></div>
+                        </div>
+                    </div>
+
+                    <div class="control-group span2 btn-group">
+                        <label>　</label>
+                        <a href="javascript:;" class="btn addopt"><?=$this->_('Add')?></a>
+                        <a href="javascript:;" class="btn removeopt"><?=$this->_('Remove')?></a>
+                    </div>
+                </fieldset>
+                <?endforeach?>
+            </div>
+        </div><!--span10 end-->
+
+
+        <div class="span10 listing-buttons">
+            <button id="save-publish" class="btn btn-success btn-large"><?=$this->_('Save')?></button>
+        </div>
+    </form>
+</div>
+
+
+<script>
+eva.ready(function(){
+
+     var resetNum = function(){
+        var num = 0;
+        $(".fieldoptions").each(function(){
+            $(this).find("input[name]").each(function(){
+                $(this).attr("name", $(this).attr('name').replace(/\d+/, num));
+            });
+            num++;
+        });
+    }
+
+    var count = 0;
+    $(".btn.addopt").live("click", function(){
+            var fieldset = $(this).parentsUntil('fieldset').parent();
+            var fieldsetClone = fieldset.clone();
+            var num = $(".fieldoptions").length;
+            fieldsetClone.find("input[id]").each(function(){
+                $(this).attr("name", $(this).attr('name').replace(/\d+/, num));
+                $(this).attr("id", $(this).attr('id') + '_' + count);
+                $(this).val('');
+            });
+            fieldsetClone.find("label[for]").each(function(){
+                $(this).attr("for", $(this).attr('for') + '_' + count);
+            });
+            fieldset.after(fieldsetClone);
+            count++;
+
+            resetNum();
+            return false;
+    });
+
+    $(".btn.removeopt").live("click", function(){
+            var fieldset = $(this).parentsUntil('fieldset').parent();
+            if($('.fieldoptions').length > 1){
+                fieldset.remove();
+            }
+            resetNum();
+            return false;
+    });
+});
+</script>

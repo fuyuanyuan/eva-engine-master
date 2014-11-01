@@ -1,0 +1,5 @@
+*
+!.htaccess
+!index.php
+!config.inc.php
+!.gitignore

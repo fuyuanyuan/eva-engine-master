@@ -1,0 +1,117 @@
+<?
+$title = $this->_('Edit File');
+$this->headTitle($title, 'SET');
+$this->textDelay('breadcrumbText', $title);
+$item = $this->item;
+
+if($this->form){
+	$form = $this->form;
+} else {
+    $form = new File\Form\FileEditForm();
+}
+
+$form->setView($this)
+->setMethod('put')
+->setAction($this->uri('/admin/file'))
+->bind($item)
+->prepare();
+?>
+
+<div class="row">
+    <form <?=$this->formAttr($form)?>>
+        <?=$form->restful();?>
+        <?=$form->helper('id')?>
+        <div class="span10">
+            <div class="slate">
+                <div class="page-header">
+                    <div class="btn-group pull-right">
+                        <a href="<?=$item['Url']?>" class="btn"><?=$this->_('Download File')?></a>
+                        <a href="<?=$this->uri('/admin/file/remove/' . $item['id'], 'c', array('c' => $this->uri('/admin/file/' . $item['id']))); ?>" class="btn"><?=$this->_('Delete')?></a>
+                    </div>
+                    <h2><?=$title?></h2>
+                </div>
+            </div>
+        </div><!--span10 end-->
+
+        <div class="span5">
+            <div class="slate">
+                <div class="page-header">
+                    <h3><?=$this->_('Edit File Info')?></h3>
+                </div>
+                <fieldset class="form-horizontal">
+
+                    <div class="control-group <?=$form->isError('title') ? 'error' : '';?>">
+                        <?=$form->helper('title', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('title', array('class' => ''))?>        
+                            <div class="help-block"><?=$form->helper('title' ,'formElementErrors')?></div>
+                        </div>
+                    </div>
+                    <div class="control-group <?=$form->isError('originalName') ? 'error' : '';?>">
+                        <?=$form->helper('originalName', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('originalName', array('class' => ''))?>        
+                            <div class="help-block"><?=$form->helper('originalName' ,'formElementErrors')?></div>
+                        </div>
+                    </div>
+                    <div class="control-group <?=$form->isError('description') ? 'error' : '';?>">
+                        <?=$form->helper('description', 'label', array('class' => 'control-label'))?>
+                        <div class="controls">
+                            <?=$form->helper('description', 'formTextarea', array('class' => ''))?>        
+                            <div class="help-block"><?=$form->helper('description', 'formElementErrors')?></div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-info btn-large"><?=$this->_('Save')?></button>
+                    </div>
+                </fieldset>
+            </div>
+        </div><!--span5 end-->
+
+        <div class="span5">
+            <div class="slate">
+                <div class="page-header">
+                    <h3><?=$this->_('File Info')?></h3>
+                </div>
+                <dl class="well dl-horizontal">
+                    <dt><?=$this->_('Original Name')?>:</dt>
+                    <dd><?=$item['originalName']?></dd>
+                    <dt><?=$this->_('File Size')?>:</dt>
+                    <dd><?=$item['ReadableFileSize']?></dd>
+                    <dt><?=$this->_('File Hash')?>:</dt>
+                    <dd><?=$item['fileHash']?></dd>
+                    <dt><?=$this->_('File Upload Time')?>:</dt>
+                    <dd><?=$item['createTime']?></dd>
+                    <?if($item['isImage']):?>
+                    <dt><?=$this->_('Image Width')?>:</dt>
+                    <dd><?=$item['imageWidth']?> px</dd>
+                    <dt><?=$this->_('Image Height')?>:</dt>
+                    <dd><?=$item['imageHeight']?> px</dd>
+                    <?endif?>
+                </dl>
+            </div>
+        </div><!--span5 end-->
+    </form>
+
+    <?if($item['isImage']):?>
+    <div class="span10">
+        <div class="slate">
+            <div class="page-header">
+                <h2><?=$this->_('Thumbnail')?></h2>
+            </div>
+            <fieldset class="">
+                <div class="control-group">
+                    <label class="control-label"><?=$this->_('Thumbnail Url')?></label>
+                    <div class="controls">
+                        <div class="input-append">
+                            <input type="text" value="<?=$item['Thumb']?>" class="span3" /><a href="<?=$item['Thumb']?>" class="btn" target="blank"><?=$this->_('Open')?></a><a href="<?=$item['Thumb']?>" class="btn" target="blank"><?=$this->_('Copy')?></a>
+                        </div>
+                    </div>
+                </div>
+                <div><img src="<?=$this->thumb($item['Thumb'], array('w_100'))?>" alt="" /></div>
+            </fieldset>
+        </div>
+    </div><!--span10 end-->
+    <?endif?>
+</div><!--row end-->

@@ -1,0 +1,18 @@
+<?=htmlentities('<?')?>
+
+$item = $this->item;
+if($this->form){
+	$form = $this->form;
+} else {
+    $form = new <?=$formClassName?>();
+}
+
+$form
+->setView($this)
+->useSubFormGroup()
+->setMethod('post')
+->setAction($this->uri('/admin/'))
+->bind($item)
+->prepare();
+<?=htmlentities('?>') . "\n"?>
+

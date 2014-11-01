@@ -1,0 +1,215 @@
+<? 
+$title = 'Form Class Generator';
+$this->headTitle($title, 'SET');
+$this->textDelay('breadcrumbText', $title);
+
+$form = new Scaffold\Form\AutoClassForm();
+$form
+->setView($this)
+->setMethod('put')
+->setAction($this->uri('/scaffold/form/'))
+->bind($this->tab);
+
+function selectType($dataName, $dataType, $columnType)
+{
+    $value = 'text';
+    if($dataName == 'id' || strpos($dataName, '_id') !== false){
+        return $value = 'hidden';
+    }
+
+    switch($dataType){
+        case 'varchar':
+        break;
+        case 'tinyint':
+        case 'smallint':
+        case 'int':
+        case 'bigint':
+        $value = 'number';
+        break;
+        case 'enum':
+        $value = 'select';
+        break;
+        case 'datetime':
+        $value = 'datetime';
+        break;
+        case 'text':
+        case 'tinytext':
+        case 'mediumtext':
+        case 'longtext':
+        $value = 'textarea';
+        break;
+    }
+    return $value;
+}
+
+function autoCheck($dataName, $dataType, $columnType)
+{
+    $check = '';
+    if(strpos($dataName, '_') !== false){
+        return $check;
+    }
+
+    switch($dataType){
+        case 'varchar':
+        case 'enum':
+        case 'text':
+        case 'tinytext':
+        case 'mediumtext':
+        case 'longtext':
+        $check = 'checked="checked"';
+        break;
+    }
+
+    if($dataName == 'id'){
+        $check = 'checked="checked"';
+    }
+    return $check;
+}
+?>
+
+<div class="row">
+    <div class="span10">
+        <header class="page-header">
+        <h2 class="">Check Inputs</h2>
+        </header>
+    </div>
+
+    <form action="<?=$this->uri('/scaffold/form/' . $this->table)?>" method="post">
+        <?=$form->restful();?>
+        <div class="span10">
+            <div class="slate">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="span1">
+                                <span class="form" data-multiform="createform">
+                                    <input type="checkbox" class="multiform-checker" />
+                                </span>
+                            </th>
+                            <th>Db Column</th>
+                            <th class="span2">Input Type</th>
+                            <th class="span1">Default</th>
+                            <th class="span2">Validators</th>
+                            <th class="span2">Filters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?if($this->columns):?>
+                        <?foreach($this->columns as $key=>$column):?>
+                        <tr id="column_<?=$column['name'] ?>" class="">
+                            <td>
+                                <input type="checkbox" class="multiform-item-checkbox" <?=autoCheck($column['name'], $column['data_type'], $column['data_type'])?>  data-multiform="createform" name="selectedColumns[<?=$key?>]" value="<?=$column['name'] ?>" />
+                            </td>
+                            <td>
+                                <a href="#"><?=$column['name'] ?></a>
+                                <span class="label label-info"><?=$column['data_type'];?></span>
+                                <p class="meta">
+                                Column Type: <span class="column_type"><?=$column['column_type'];?></span>
+                                <br />
+                                <?if($column['column_default']):?>
+                                Column Default: <span class="is_nullable"><?=$column['column_default'];?></span>
+                                <br />
+                                <?endif?>
+                                Is Nullable: <span class="is_nullable"><?=$column['is_nullable'] ? $column['is_nullable'] : '0';?></span>
+                                </p>
+                            </td>
+                            <td>
+                                <?=$form->helper('inputType[]', 'formSelect', array(
+                                    'class' => 'span2',
+                                    'name' => "inputType[$key]",
+                                    'id' => 'scaffold-form-postform-select-type-' . $key,
+                                    'value' => selectType($column['name'], $column['data_type'], $column['data_type'])
+                                ))?>
+                            </td>
+                            <td>
+                                <input type="text" name="defaults[<?=$key?>]" class="span1" value="<?=$column['column_default'];?>" />
+                            </td>
+                            <td>
+                                <?=$form->helper('validators[]', 'formMultiCheckbox', array(
+                                    'name' => "validators[$key]",
+                                ))?>
+                            </td> 
+                            <td>
+                                <?=$form->helper('filters[]', 'formMultiCheckbox', array(
+                                    'name' => "filters[$key]",
+                                ))?>
+                            </td> 
+                        </tr>
+                        <?endforeach;?>
+                        <?endif;?>
+                    </tbody>
+                </table>
+            </div>
+        </div><!--span10 end-->
+        <div class="span10 listing-buttons">
+            <button class="btn btn-info btn-large">Create Form Class</button>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    var validatorMapping = {
+            'text' : ['StringLength'],
+            'email' : ['EmailAddress'],
+            'url' : ['Uri'],
+            'select' : ['InArray'],
+            'radio' : ['InArray'],
+            'multiCheckbox' : ['InArray'],
+    };
+
+    var filtersMapping = {
+            'text' : ['StripTags', 'StringTrim'],
+            'email' : ['StripTags', 'StringTrim'],
+            'url' : ['StripTags', 'StringTrim']
+    };
+    function autoValidators(){
+            var typeSelector = $(this);
+            var type = $(this).val();
+            var validator = typeSelector.parentsUntil("tr").parent().find("input[name^='validators']");
+            var isNullable = typeSelector.parentsUntil("tr").parent().find(".is_nullable").html();
+            validator.attr("checked", false);
+
+            var filter = [];
+            if(isNullable == '0') {
+                    filter.push("[value='NotEmpty']");
+            }
+            if(validatorMapping[type]){
+
+
+                    for(var i in validatorMapping[type]){
+                            filter.push("[value='" + validatorMapping[type][i] + "']");
+                    }
+
+
+
+            }
+            if(filter.length > 0){
+                    filter = filter.join(",");
+                    validator.filter(filter).attr("checked", true);
+            }
+    }
+    function autoFilters(){
+            var typeSelector = $(this);
+            var type = $(this).val();
+            var filters = typeSelector.parentsUntil("tr").parent().find("input[name^='filters']");
+
+            filters.attr("checked", false);
+
+            var filter = [];
+            if(filtersMapping[type]){
+                    for(var i in filtersMapping[type]){
+                            filter.push("[value='" + filtersMapping[type][i] + "']");
+                    }
+
+                    if(filter.length > 0){
+                            filter = filter.join(",");
+                            filters.filter(filter).attr("checked", true);
+                    }
+
+            }
+    }
+    $("select[name^='inputType']").on("change", autoValidators).each(autoValidators);
+    $("select[name^='inputType']").on("change", autoFilters).each(autoFilters);
+
+</script>

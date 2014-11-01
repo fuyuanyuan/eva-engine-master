@@ -1,0 +1,102 @@
+<?
+$title = $this->_('Dashboard');
+$this->headTitle($title, 'SET');
+$this->textDelay('breadcrumbText', $title);
+
+$posts = $this->posts;
+?>
+<div class="main-area dashboard">
+
+    <div class="row">
+        <div class="span10">
+            <div class="slate clearfix">
+                <a href="<?=$this->uri('/admin/blog/')?>" class="stat-column">
+                    <span class="number"><?=$this->postsCount ? $this->postsCount : '0'?></span>
+                    <span><?=$this->_('Blog Posts')?></span>
+                </a>
+
+                <a href="<?=$this->uri('/admin/file/')?>" class="stat-column">
+                    <span class="number"><?=$this->filesCount ? $this->filesCount : '0'?></span>
+                    <span><?=$this->_('Uploaded Files')?></span>
+                </a>
+
+
+                <a href="<?=$this->uri('/admin/user/')?>" class="stat-column">
+                    <span class="number"><?=$this->usersCount ? $this->usersCount : '0'?></span>
+                    <span><?=$this->_('Register Users')?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <?if($this->posts):?>
+        <div class="span5">
+            <div class="slate">
+                <div class="page-header">
+                    <a href="<?=$this->uri('/admin/blog/create')?>" class="pull-right btn"><?=$this->_('Add New Post')?></a>
+                    <a href="<?=$this->uri('/admin/blog/')?>" class="pull-right btn"><?=$this->_('Post List')?></a>
+                    <h2><?=$this->_('New Posts')?></h2>
+                </div>
+                <table class="orders-table table">
+                    <tbody>
+                        <?foreach($this->posts as $key=>$post):?>
+                        <tr>
+                            <td><a href="<?=$this->uri('/admin/blog/' . $post['id'])?>" class="title"><?=$post['title'] ?></a></td>
+                            <td class="date"><span class="meta"><?=$post['user_name'] ?> <?=$post['createTime'];?></span></td>
+                        </tr>
+                        <?endforeach?>
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- span5 end-->
+        <?endif?>
+
+        <?if($this->files):?>
+        <div class="span5">
+            <div class="slate">
+                <div class="page-header">
+                    <a href="<?=$this->uri('/admin/file/upload')?>" class="pull-right btn"><?=$this->_('Upload')?></a>
+                    <a href="<?=$this->uri('/admin/file/')?>" class="pull-right btn"><?=$this->_('File List')?></a>
+                    <h2><?=$this->_('New Files')?></h2>
+                </div>
+                <table class="orders-table table">
+                    <tbody>
+                        <?foreach($this->files as $key=>$file):?>
+                        <tr>
+                            <td><a href="<?=$this->uri('/admin/file/' . $file['id'])?>" class="title"><?=$file['originalName'] ?></a></td>
+                            <td class="date"><span class="meta"><?=$file['user_name'] ?> <?=$file['createTime'];?></span></td>
+                        </tr>
+                        <?endforeach?>
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- span5 end-->
+        <?endif?>
+
+        <?if($this->users):?>
+        <div class="span5">
+            <div class="slate">
+                <div class="page-header">
+                    <a href="<?=$this->uri('/admin/user/create')?>" class="pull-right btn"><?=$this->_('Add User')?></a>
+                    <a href="<?=$this->uri('/admin/user/')?>" class="pull-right btn"><?=$this->_('User List')?></a>
+                    <h2><?=$this->_('New Users')?></h2>
+                </div>
+                <table class="orders-table table">
+                    <tbody>
+                        <?foreach($this->users as $key=>$user):?>
+                        <tr>
+                            <td><a href="<?=$this->uri('/admin/user/' . $user['id'])?>" class="title"><?=$user['userName'] ?></a></td>
+                            <td class="date"><span class="meta"><?=$user['registerTime'];?></span></td>
+                        </tr>
+                        <?endforeach?>
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- span5 end-->
+        <?endif?>
+
+    </div>
+
+</div>
